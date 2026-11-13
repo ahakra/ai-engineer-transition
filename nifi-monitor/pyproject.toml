@@ -13,8 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-nifi-monitor = "nifi_monitor:main"
-
+nifi-monitor = "nifi_monitor.main:main"
 [build-system]
 requires = ["uv_build>=0.13.8,<0.14.0"]
 build-backend = "uv_build"
