@@ -2,11 +2,11 @@
 
 **Updated:** 2026-11-13  
 **Repository:** https://github.com/ahakra/ai-engineer-transition  
-**Current milestone:** M0 — NiFi Lab  
-**Milestone status:** **READY FOR VALIDATION**  
-**Current task:** M0 closeout — evidence/reproducibility review  
-**Task status:** **READY FOR VALIDATION**  
-**Last verified completed task:** M0 functional pipeline and three failure reproductions
+**Current milestone:** M1 — Python Monitoring  
+**Milestone status:** **NOT STARTED**  
+**Current task:** M1.1 — Read-only NiFi REST status retrieval  
+**Task status:** **NOT STARTED**  
+**Last verified completed task:** M0 — NiFi Lab (same-instance export/import plus failure reproductions)
 
 ## Verified results (reviewed from user-run lab evidence)
 
@@ -18,9 +18,11 @@
 - **Flow export — COMPLETED:** `nifi/flows/AI_Incident_Lab.json` fetched and validated in GitHub: 8 processors, 7 connections, pinned NiFi processor bundles 2.12.0, healthy generator payload and healthy PutFile destination.
 - **Scenario documentation — COMPLETED:** `docs/INCIDENT_FIXTURES.md` committed with steps, direct evidence, diagnoses, remediation, and explicit gaps.
 
-## Open M0 validation limitations
+- **Re-import — VERIFIED (same NiFi instance):** user imported exported flow and provided screenshot with 8 processors, 7 connections, all stopped, empty queues and no visible processor warnings. This verifies same-instance import, not fresh installation portability.
 
-- Flow export was not imported into an independent clean NiFi instance; reproducibility via import remains unverified.
+## M0 residual limitations
+
+- Flow export was successfully re-imported into the existing NiFi instance; clean-install portability remains unverified.
 - Exception logs, screenshots, and FlowFile evidence have not been committed as sanitized machine-readable JSON test fixtures.
 - For PutFile failure the downstream logger consumed the failed FlowFile; queue retention wasn't observed.
 - Full downstream queue drain after stopped-processor recovery was not established by a final queue screenshot, though the generator→validator queue drained and files were written.
@@ -30,7 +32,7 @@
 
 | Milestone | Status | Verified result |
 | --- | --- | --- |
-| M0 — NiFi Lab | READY FOR VALIDATION | Working baseline, failure reproductions, export, documentation; closeout gaps above |
+| M0 — NiFi Lab | COMPLETED | Working lab, failure reproductions, recovery, export and same-instance re-import; residual limitations above |
 | M1 — Python Monitoring | NOT STARTED | — |
 | M2 — Ollama Integration | NOT STARTED | — |
 | M3 — First Agent | NOT STARTED | — |
@@ -60,9 +62,10 @@
 | 2026-11-13 | Stopped processor and queue | Two screenshots showing 1→2 waiting FlowFiles | VERIFIED |
 | 2026-11-13 | Final NiFi flow export | `nifi/flows/AI_Incident_Lab.json` fetched from `main` | VERIFIED |
 | 2026-11-13 | Incident documentation | `docs/INCIDENT_FIXTURES.md` committed | VERIFIED |
+| 2026-11-13 | Same-instance re-import | User-provided screenshot of imported group (8 processors, 7 connections, no visible warnings) | M0 COMPLETED |
 
 ## One next action
 
-**M0 closeout:** On a clean NiFi instance, import the committed `nifi/flows/AI_Incident_Lab.json` and verify it loads with 8 processors / 7 connections and no validation errors; capture evidence. Do not claim clean import success until user demonstrates it.
+**M1.1 — Verify read-only NiFi REST connectivity.** From the local machine, obtain an authenticated, read-only `GET /nifi-api/process-groups/{id}/processors` response for `AI Incident Lab`, without saving credentials or tokens to the repository. Verify HTTP success and that returned processor names match the exported flow. User implements this task; ChatGPT reviews output and then assigns the next smallest Python task.
 
-After completing M0, begin M1 with a *single smallest practical task*: a read-only, testable Python REST client to retrieve Process Group processor status.
+_M0 is complete for the current lab scope. Fresh deployment import and machine-readable fixtures remain documented follow-up gaps, not silently claimed successes._
