@@ -1,6 +1,6 @@
 
 import os
-
+import typing
 import httpx
 
 
@@ -35,3 +35,52 @@ def get_processors(token: str) -> list[dict[str, object]]:
         )
         response.raise_for_status()
         return response.json()["processors"]
+
+
+
+def get_processor_info(token: str, id: str) -> dict[str, typing.Any]:
+    base_url = os.environ["NIFI_BASE_URL"].rstrip("/")
+
+    with httpx.Client(verify=False, timeout=10.0) as client:
+        response = client.get(
+            f"{base_url}/nifi-api/processors/{id}",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        response.raise_for_status()
+
+        data = response.json()
+
+        component = data.get("component") or {}
+        status = data.get("status") or {}
+        snapshot = status.get("aggregateSnapshot") or {}
+
+        return {
+            "id": data.get("id"),
+            "name": component.get("name"),
+            "state": component.get("state"),
+            "physical_state": data.get("physicalState"),
+            "input": {
+                "flowfiles": snapshot.get("flowFilesIn", 0),
+                "bytes": snapshot.get("bytesIn", 0),
+            },
+            "output": {
+                "flowfiles": snapshot.get("flowFilesOut", 0),
+                "bytes": snapshot.get("bytesOut", 0),
+            },
+            "bulletins": data.get("bulletins", []),
+        }
+
+
+
+def get_processor_status(token: str, id: str) -> dict[str, typing.Any]:
+    base_url = os.environ["NIFI_BASE_URL"].rstrip("/")
+
+    with httpx.Client(verify=False, timeout=10.0) as client:
+        response = client.get(
+            f"{base_url}/nifi-api/flow/processors/{id}/status",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        response.raise_for_status()
+
+        data = response.json()
+        return  data
