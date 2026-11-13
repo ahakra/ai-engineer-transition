@@ -1,0 +1,215 @@
+
+# ==========================================
+# Secrets and environment configuration
+# ==========================================
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
+!.gitkeep
+
+# ==========================================
+# Python
+# ==========================================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.pytype/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+dist/
+build/
+.ipynb_checkpoints/
+.python-version
+
+# ==========================================
+# Rust
+# ==========================================
+target/
+*.rs.bk
+
+# ==========================================
+# C / C++
+# ==========================================
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.out
+*.pdb
+*.ilk
+*.dSYM/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+Makefile.in
+
+# ==========================================
+# Java / JVM
+# ==========================================
+*.class
+*.jar
+*.war
+*.ear
+.gradle/
+.gradle-cache/
+.settings/
+.classpath
+.project
+target/
+out/
+
+# ==========================================
+# Go
+# ==========================================
+*.test
+*.prof
+coverage.out
+vendor/
+
+# ==========================================
+# C# / .NET
+# ==========================================
+bin/
+obj/
+.vs/
+*.user
+*.suo
+TestResults/
+*.coverage
+*.coveragexml
+packages/
+project.assets.json
+
+# ==========================================
+# JavaScript / TypeScript
+# ==========================================
+node_modules/
+.next/
+.nuxt/
+.svelte-kit/
+.turbo/
+.parcel-cache/
+.npm/
+.yarn/cache/
+.pnpm-store/
+*.tsbuildinfo
+coverage/
+dist/
+
+# ==========================================
+# Docker
+# ==========================================
+docker-data/
+docker-volumes/
+docker-volumes-*/
+*.pid
+*.log
+docker-compose.override.yml
+compose.override.yaml
+
+# ==========================================
+# Apache NiFi runtime data
+# ==========================================
+nifi-data/
+nifi-state/
+nifi-logs/
+nifi-conf-local/
+flowfile_repository/
+content_repository/
+provenance_repository/
+database_repository/
+state/
+work/
+logs/
+bootstrap.conf.local
+
+# ==========================================
+# AI / ML / Ollama / Hugging Face
+# ==========================================
+models/
+model-cache/
+ollama-data/
+.huggingface/
+.cache/huggingface/
+wandb/
+mlruns/
+lightning_logs/
+checkpoints/
+*.gguf
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.onnx
+
+# Vector database local storage
+chroma-data/
+chroma_db/
+qdrant_storage/
+faiss-index/
+vector-data/
+
+# ==========================================
+# Databases
+# ==========================================
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.sqlite3-journal
+*.bak
+*.dump
+
+# ==========================================
+# IDEs and editors
+# ==========================================
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# Temporary files
+# ==========================================
+tmp/
+temp/
+.cache/
+*.tmp
+*.temp
+*.orig
+*.rej
