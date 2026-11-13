@@ -2,7 +2,7 @@
 
 Portfolio project for evidence-grounded diagnosis of failures across integration systems. **Apache NiFi is the first adapter**, not the entire product.
 
-**Current milestone: M0 — NiFi Lab.** No running NiFi instance or incident scenario has been verified yet.
+**Current milestone: M1 — Python Monitoring.** M0 NiFi Lab was completed in the local lab (healthy pipeline, failure scenarios, recovery, committed flow, same-instance import); see [docs/PROGRESS.md](docs/PROGRESS.md) for remaining limitations.
 
 ## First local setup
 
@@ -11,6 +11,8 @@ Portfolio project for evidence-grounded diagnosis of failures across integration
 3. Run `make nifi-config`, `make nifi-pull`, `make nifi-up`, then `make nifi-ps`.
 4. Follow `make nifi-logs`. Visit https://localhost:8443/nifi/ (or the port configured in `.env`), wait for startup, and log in.
 5. Verify that the HTTPS endpoint responds as described in [docker/README.md](docker/README.md). Stop with `make nifi-down`.
+
+For the Python application, see [nifi-monitor/README.md](nifi-monitor/README.md). From the repository root, run `make monitor-check` for linting, formatting checks, static type checking, and offline tests, or `make monitor-run` to query your local NiFi instance.
 
 See [AGENTS.md](AGENTS.md) for engineering rules, [docs/ROADMAP.md](docs/ROADMAP.md) for milestones, and [docs/PROGRESS.md](docs/PROGRESS.md) for verifiable progress.
 
