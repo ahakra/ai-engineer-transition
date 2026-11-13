@@ -18,7 +18,9 @@ def test_format_table_rejects_misaligned_rows() -> None:
         format_table(("Name", "State"), [("ValidateJson",)])
 
 
-def test_missing_metric_not_reported_as_zero(capsys: pytest.CaptureFixture[str]) -> None:
+def test_missing_metric_not_reported_as_zero(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     show_processor_status(
         {"processorStatus": {"name": "ValidateJson", "aggregateSnapshot": {}}}
     )
@@ -42,7 +44,13 @@ def test_read_only_status_endpoint_and_bearer_header() -> None:
                 200,
                 json={
                     "processors": [
-                        {"component": {"id": "p1", "name": "ValidateJson", "state": "STOPPED"}}
+                        {
+                            "component": {
+                                "id": "p1",
+                                "name": "ValidateJson",
+                                "state": "STOPPED",
+                            }
+                        }
                     ]
                 },
             )
@@ -68,4 +76,7 @@ def test_read_only_status_endpoint_and_bearer_header() -> None:
     assert status["processorStatus"] is not None
     assert [request.method for request in requests] == ["GET", "GET"]
     assert requests[1].url.path == "/nifi-api/flow/processors/p1/status"
-    assert all(request.headers["Authorization"] == "Bearer fake-token" for request in requests)
+    assert all(
+        request.headers["Authorization"] == "Bearer fake-token"
+        for request in requests
+    )
