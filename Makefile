@@ -8,6 +8,8 @@ ENV_PATH := $(abspath $(ENV_FILE))
 
 DOCKER ?= docker
 OLLAMA ?= ollama
+UV ?= uv
+MONITOR_DIR := $(ROOT_DIR)nifi-monitor
 MODEL ?= gemma4:e4b-it-q4_K_M
 OLLAMA_BIND ?= 127.0.0.1:11434
 
@@ -20,7 +22,9 @@ NIFI_COMPOSE = $(DOCKER) compose \
 .PHONY: help check-env \
 	nifi nifi-up nifi-down nifi-logs nifi-ps \
 	nifi-config nifi-pull \
-	ollama-serve ollama ollama-gemma ollama-qwen
+	ollama-serve ollama ollama-gemma ollama-qwen \
+	monitor-run monitor-lint monitor-format monitor-format-check \
+	monitor-typecheck monitor-test monitor-check
 
 # ==========================================
 # Help
@@ -44,6 +48,15 @@ help:
 	  '  make ollama        Run configured model' \
 	  '  make ollama-gemma  Run Gemma' \
 	  '  make ollama-qwen   Run Qwen' \
+	  '' \
+	  'Python NiFi monitor:' \
+	  '  make monitor-run          Run CLI against local NiFi' \
+	  '  make monitor-lint         Ruff lint (no changes)' \
+	  '  make monitor-format       Ruff auto-format (modifies files)' \
+	  '  make monitor-format-check Check formatting (no changes)' \
+	  '  make monitor-typecheck    Mypy strict static types' \
+	  '  make monitor-test         Run offline pytest tests' \
+	  '  make monitor-check        Run all non-mutating quality checks' \
 	  '' \
 	  'Environment:' \
 	  '  ENV_FILE=.env by default' \
@@ -99,3 +112,27 @@ ollama-gemma:
 
 ollama-qwen:
 	$(OLLAMA) run "qwen3.5:9b"
+
+# ==========================================
+# Python NiFi monitor (uv-managed project)
+# ==========================================
+
+monitor-run:
+	cd "$(MONITOR_DIR)" && $(UV) run nifi-monitor
+
+monitor-lint:
+	cd "$(MONITOR_DIR)" && $(UV) run ruff check .
+
+monitor-format:
+	cd "$(MONITOR_DIR)" && $(UV) run ruff format .
+
+monitor-format-check:
+	cd "$(MONITOR_DIR)" && $(UV) run ruff format --check .
+
+monitor-typecheck:
+	cd "$(MONITOR_DIR)" && $(UV) run mypy src
+
+monitor-test:
+	cd "$(MONITOR_DIR)" && $(UV) run pytest -v
+
+monitor-check: monitor-lint monitor-format-check monitor-typecheck monitor-test
