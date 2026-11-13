@@ -1,86 +1,60 @@
+"""Minimal read-only NiFi REST calls; authentication is the only POST."""
 
 import os
-import typing
+from typing import Any, TypedDict
+
 import httpx
 
 
-def get_access_token() -> str:
-    base_url = os.environ["NIFI_BASE_URL"].rstrip("/")
-    username = os.environ["NIFI_USERNAME"]
-    password = os.environ["NIFI_PASSWORD"]
-
-    with httpx.Client(
-        verify=False,  # Local self-signed NiFi lab only
-        timeout=10.0,
-    ) as client:
-        response = client.post(
-            f"{base_url}/nifi-api/access/token",
-            data={
-                "username": username,
-                "password": password,
-            },
-        )
-        response.raise_for_status()
-        return response.text.strip()
+class ProcessorComponent(TypedDict):
+    id: str
+    name: str
+    state: str
 
 
-def get_processors(token: str) -> list[dict[str, object]]:
-    base_url = os.environ["NIFI_BASE_URL"].rstrip("/")
-    group_id = os.environ["NIFI_PROCESS_GROUP_ID"]
-
-    with httpx.Client(verify=False, timeout=10.0) as client:
-        response = client.get(
-            f"{base_url}/nifi-api/process-groups/{group_id}/processors",
-            headers={"Authorization": f"Bearer {token}"},
-        )
-        response.raise_for_status()
-        return response.json()["processors"]
+class ProcessorEntity(TypedDict):
+    component: ProcessorComponent
 
 
-
-def get_processor_info(token: str, id: str) -> dict[str, typing.Any]:
-    base_url = os.environ["NIFI_BASE_URL"].rstrip("/")
-
-    with httpx.Client(verify=False, timeout=10.0) as client:
-        response = client.get(
-            f"{base_url}/nifi-api/processors/{id}",
-            headers={"Authorization": f"Bearer {token}"},
-        )
-        response.raise_for_status()
-
-        data = response.json()
-
-        component = data.get("component") or {}
-        status = data.get("status") or {}
-        snapshot = status.get("aggregateSnapshot") or {}
-
-        return {
-            "id": data.get("id"),
-            "name": component.get("name"),
-            "state": component.get("state"),
-            "physical_state": data.get("physicalState"),
-            "input": {
-                "flowfiles": snapshot.get("flowFilesIn", 0),
-                "bytes": snapshot.get("bytesIn", 0),
-            },
-            "output": {
-                "flowfiles": snapshot.get("flowFilesOut", 0),
-                "bytes": snapshot.get("bytesOut", 0),
-            },
-            "bulletins": data.get("bulletins", []),
-        }
+def get_access_token(client: httpx.Client) -> str:
+    """Authenticate against NiFi. Never log the returned bearer token."""
+    response = client.post(
+        "/nifi-api/access/token",
+        data={
+            "username": os.environ["NIFI_USERNAME"],
+            "password": os.environ["NIFI_PASSWORD"],
+        },
+    )
+    response.raise_for_status()
+    token = response.text.strip()
+    if not token:
+        raise ValueError("NiFi returned an empty access token")
+    return token
 
 
+def get_processors(
+    client: httpx.Client, token: str, group_id: str
+) -> list[ProcessorEntity]:
+    """Return processor names, IDs and configured states."""
+    response = client.get(
+        f"/nifi-api/process-groups/{group_id}/processors",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    response.raise_for_status()
+    data: Any = response.json()
+    # At the HTTP/JSON boundary, a typed declaration does not validate the
+    # remote server response. Runtime schema validation comes in a later task.
+    return data["processors"]
 
-def get_processor_status(token: str, id: str) -> dict[str, typing.Any]:
-    base_url = os.environ["NIFI_BASE_URL"].rstrip("/")
 
-    with httpx.Client(verify=False, timeout=10.0) as client:
-        response = client.get(
-            f"{base_url}/nifi-api/flow/processors/{id}/status",
-            headers={"Authorization": f"Bearer {token}"},
-        )
-        response.raise_for_status()
-
-        data = response.json()
-        return  data
+def get_processor_status(
+    client: httpx.Client, token: str, processor_id: str
+) -> dict[str, object]:
+    """Return a processor's status entity (not its configuration entity)."""
+    response = client.get(
+        f"/nifi-api/flow/processors/{processor_id}/status",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    response.raise_for_status()
+    data: dict[str, object] = response.json()
+    return data
