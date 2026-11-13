@@ -4,8 +4,8 @@
 **Repository:** https://github.com/ahakra/ai-engineer-transition  
 **Current milestone:** M1 — Python Monitoring  
 **Milestone status:** **NOT STARTED**  
-**Current task:** M1.1 — Read-only NiFi REST status retrieval  
-**Task status:** **NOT STARTED**  
+**Current task:** M1.2 — Processor runtime status retrieval + quality gates  
+**Task status:** **READY FOR VALIDATION**  
 **Last verified completed task:** M0 — NiFi Lab (same-instance export/import plus failure reproductions)
 
 ## Verified results (reviewed from user-run lab evidence)
@@ -19,6 +19,14 @@
 - **Scenario documentation — COMPLETED:** `docs/INCIDENT_FIXTURES.md` committed with steps, direct evidence, diagnoses, remediation, and explicit gaps.
 
 - **Re-import — VERIFIED (same NiFi instance):** user imported exported flow and provided screenshot with 8 processors, 7 connections, all stopped, empty queues and no visible processor warnings. This verifies same-instance import, not fresh installation portability.
+
+## M1 progress (2026-11-13)
+
+- User verified `uv run nifi-monitor` authenticates against the local NiFi instance and prints 8 processors and the `ValidateJson` status reporting window.
+- Mypy initially detected an `Any` return and `list` invariance in table rows. Corrected with `cast(list[ProcessorEntity], ...)` and `Sequence[tuple[str, ...]]`; this cast does **not** validate HTTP data at runtime.
+- Ruff B905 flagged `zip` missing `strict=`; corrected with `zip(..., strict=True)`.
+- Root Makefile now exposes `make monitor-check` (lint, formatting check, mypy, pytest), `make monitor-run`, and individual check targets. `nifi-monitor/README.md` explains each command.
+- **Validation pending:** after pulling these commits, user must run `make monitor-check` and `make monitor-run`; do not mark M1.2 COMPLETED before actual command outputs are reviewed.
 
 ## M0 residual limitations
 
@@ -66,6 +74,4 @@
 
 ## One next action
 
-**M1.1 — Verify read-only NiFi REST connectivity.** From the local machine, obtain an authenticated, read-only `GET /nifi-api/process-groups/{id}/processors` response for `AI Incident Lab`, without saving credentials or tokens to the repository. Verify HTTP success and that returned processor names match the exported flow. User implements this task; ChatGPT reviews output and then assigns the next smallest Python task.
-
-_M0 is complete for the current lab scope. Fresh deployment import and machine-readable fixtures remain documented follow-up gaps, not silently claimed successes._
+From the repository root, pull the latest changes and run `make monitor-check` and `make monitor-run`. Submit the output so M1.2 can be validated before implementing connection queue monitoring.
