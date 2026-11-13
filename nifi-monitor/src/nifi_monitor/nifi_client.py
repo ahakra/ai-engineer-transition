@@ -1,7 +1,7 @@
 """Minimal read-only NiFi REST calls; authentication is the only POST."""
 
 import os
-from typing import Any, TypedDict
+from typing import TypedDict, cast
 
 import httpx
 
@@ -41,10 +41,10 @@ def get_processors(
         headers={"Authorization": f"Bearer {token}"},
     )
     response.raise_for_status()
-    data: Any = response.json()
+    data = response.json()
     # At the HTTP/JSON boundary, a typed declaration does not validate the
     # remote server response. Runtime schema validation comes in a later task.
-    return data["processors"]
+    return cast(list[ProcessorEntity], data["processors"])
 
 
 def get_processor_status(
