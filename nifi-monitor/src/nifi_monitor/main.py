@@ -27,7 +27,9 @@ def format_table(headers: tuple[str, ...], rows: Sequence[tuple[str, ...]]) -> s
     ]
 
     def render(row: tuple[str, ...]) -> str:
-        return " | ".join(value.ljust(width) for value, width in zip(row, widths, strict=True))
+        return " | ".join(
+            value.ljust(width) for value, width in zip(row, widths, strict=True)
+        )
 
     separator = "-+-".join("-" * width for width in widths)
     return "\n".join([render(headers), separator, *(render(row) for row in rows)])
