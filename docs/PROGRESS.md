@@ -5,14 +5,14 @@
 **Current milestone:** M0 — NiFi Lab  
 **Milestone status:** **NOT STARTED**  
 **Current task:** M0.1 — Local NiFi boot  
-**Task status:** **NOT STARTED**  
+**Task status:** **IN PROGRESS**  
 **Last verified implementation milestone:** None
 
 ## Verified repository evidence
 - GitHub repository `ahakra/ai-engineer-transition` was accessible on the `main` branch.
 - `AGENTS.md` was created on `main` in commit `1cf8dee8d0f3890bbf355d7c154a94e56aae610c`.
 - Prior to adding these tracking documents, the repository contained a starter `README.md` and `AGENTS.md`.
-- **No NiFi deployment, pipeline, incident fixtures, Python app, test suite, or runtime execution has been verified.** These are not claimed complete.
+- M0.1 configuration scaffolding exists in GitHub: a pinned NiFi Compose file, `.env.example`, Makefile and local startup documentation. A static repository review does not verify Docker startup.\n- **No NiFi runtime, pipeline, incident fixtures, Python app, test suite, or runtime execution has been verified.** These are not claimed complete.
 
 ## Milestone tracker
 
@@ -68,9 +68,9 @@
 | --- | --- | --- | --- |
 | 2026-11-13 | Repository access | GitHub repository metadata and `main` contents inspected | Verified |
 | 2026-11-13 | Codex instructions | `AGENTS.md` commit `1cf8dee8d0f3890bbf355d7c154a94e56aae610c` | Verified |
-| 2026-11-13 | Governance documents | Both files committed and fetched from `main` | COMPLETED |
+| 2026-11-13 | Governance documents | Both files committed and fetched from `main` | COMPLETED |\n| 2026-11-13 | M0.1 setup | NiFi Compose, Makefile, environment example, startup docs reviewed; runtime not yet tested | IN PROGRESS |
 
 ## One next action
-After verifying both governance documents, assign **M0.1 — Local NiFi boot** to Codex and review its actual Docker startup evidence. Do not advance until M0.1's acceptance criteria are met.
+The repository owner runs **M0.1 — Local NiFi boot** on their own machine and submits sanitized `make nifi-config`, `make nifi-ps`, HTTPS readiness/login and restart/shutdown evidence for ChatGPT review. Do not advance until the acceptance criteria are met.
 
 _Update this document when evidence changes. Never mark tests successful because code merely exists._
