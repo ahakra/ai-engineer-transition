@@ -1,6 +1,7 @@
 """Command-line entry point for inspecting the NiFi lab (read-only)."""
 
 import os
+from collections.abc import Sequence
 from pathlib import Path
 
 import httpx
@@ -15,7 +16,7 @@ from nifi_monitor.nifi_client import (
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
-def format_table(headers: tuple[str, ...], rows: list[tuple[str, ...]]) -> str:
+def format_table(headers: tuple[str, ...], rows: Sequence[tuple[str, ...]]) -> str:
     """Format small terminal tables without adding a UI dependency."""
     if any(len(row) != len(headers) for row in rows):
         raise ValueError("Every table row must match the header width")
@@ -26,7 +27,7 @@ def format_table(headers: tuple[str, ...], rows: list[tuple[str, ...]]) -> str:
     ]
 
     def render(row: tuple[str, ...]) -> str:
-        return " | ".join(value.ljust(width) for value, width in zip(row, widths))
+        return " | ".join(value.ljust(width) for value, width in zip(row, widths, strict=True))
 
     separator = "-+-".join("-" * width for width in widths)
     return "\n".join([render(headers), separator, *(render(row) for row in rows)])
