@@ -77,6 +77,5 @@ def test_read_only_status_endpoint_and_bearer_header() -> None:
     assert [request.method for request in requests] == ["GET", "GET"]
     assert requests[1].url.path == "/nifi-api/flow/processors/p1/status"
     assert all(
-        request.headers["Authorization"] == "Bearer fake-token"
-        for request in requests
+        request.headers["Authorization"] == "Bearer fake-token" for request in requests
     )
