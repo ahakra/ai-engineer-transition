@@ -3,76 +3,66 @@
 **Updated:** 2026-11-13  
 **Repository:** https://github.com/ahakra/ai-engineer-transition  
 **Current milestone:** M0 — NiFi Lab  
-**Milestone status:** **NOT STARTED**  
-**Current task:** M0.1 — Local NiFi boot  
-**Task status:** **IN PROGRESS**  
-**Last verified implementation milestone:** None
+**Milestone status:** **READY FOR VALIDATION**  
+**Current task:** M0 closeout — evidence/reproducibility review  
+**Task status:** **READY FOR VALIDATION**  
+**Last verified completed task:** M0 functional pipeline and three failure reproductions
 
-## Verified repository evidence
-- GitHub repository `ahakra/ai-engineer-transition` was accessible on the `main` branch.
-- `AGENTS.md` was created on `main` in commit `1cf8dee8d0f3890bbf355d7c154a94e56aae610c`.
-- Prior to adding these tracking documents, the repository contained a starter `README.md` and `AGENTS.md`.
-- M0.1 configuration scaffolding exists in GitHub: a pinned NiFi Compose file, `.env.example`, Makefile and local startup documentation. A static repository review does not verify Docker startup.
-- **No NiFi runtime, pipeline, incident fixtures, Python app, test suite, or runtime execution has been verified.** These are not claimed complete.
+## Verified results (reviewed from user-run lab evidence)
+
+- **M0.1 — COMPLETED:** version-pinned NiFi Docker lab started; HTTPS `/nifi/` returned HTTP 200; user verified UI access and Process Group persistence across Docker restart.
+- **M0.2 — COMPLETED:** healthy JSON order routed by `ValidateJson`; malformed JSON routed `failure` with `JsonEOFException`; schema-invalid negative amount emitted `json.validation.errors`.
+- **M0.3 — COMPLETED (reproduction):** healthy PutFile delivery to `/tmp/ai-incident-lab/orders`; invalid directory `/dev/null/orders` caused `FileSystemException: Not a directory` originating from PutFile; failed order logged to delivery-failure branch; healthy destination restored and a new output file verified.
+- **M0.4 — COMPLETED (reproduction):** generator running, validator stopped, upstream queue grew from 1 (52 bytes) to 2 (104 bytes) FlowFiles. On recovery, upstream queue drained to zero; total destination files later reached seven. A single definitive all-queues-empty screenshot was not supplied.
+- **Filename behavior — COMPLETED:** `UpdateAttribute` property `filename = order-${uuid}.json`; newly written 52-byte `order-...json` file confirmed on disk.
+- **Flow export — COMPLETED:** `nifi/flows/AI_Incident_Lab.json` fetched and validated in GitHub: 8 processors, 7 connections, pinned NiFi processor bundles 2.12.0, healthy generator payload and healthy PutFile destination.
+- **Scenario documentation — COMPLETED:** `docs/INCIDENT_FIXTURES.md` committed with steps, direct evidence, diagnoses, remediation, and explicit gaps.
+
+## Open M0 validation limitations
+
+- Flow export was not imported into an independent clean NiFi instance; reproducibility via import remains unverified.
+- Exception logs, screenshots, and FlowFile evidence have not been committed as sanitized machine-readable JSON test fixtures.
+- For PutFile failure the downstream logger consumed the failed FlowFile; queue retention wasn't observed.
+- Full downstream queue drain after stopped-processor recovery was not established by a final queue screenshot, though the generator→validator queue drained and files were written.
+- No automated NiFi test or Python collector has yet been executed.
 
 ## Milestone tracker
 
 | Milestone | Status | Verified result |
 | --- | --- | --- |
-| M0 — NiFi Lab | NOT STARTED | No validated deployment or failure scenarios |
+| M0 — NiFi Lab | READY FOR VALIDATION | Working baseline, failure reproductions, export, documentation; closeout gaps above |
 | M1 — Python Monitoring | NOT STARTED | — |
 | M2 — Ollama Integration | NOT STARTED | — |
 | M3 — First Agent | NOT STARTED | — |
-| M4 — Multi-Agent | NOT STARTED | Conditional on M3 evidence |
+| M4 — Multi-Agent | NOT STARTED | Conditional on M3 |
 | M5 — RAG & Context | NOT STARTED | — |
 | M6 — Second Adapter | NOT STARTED | — |
 | M7 — Production | NOT STARTED | — |
 | M8 — Advanced AI / Inference | NOT STARTED | Conditional on benchmarks |
 
-## Current task — Governance baseline
-**Objective:** Establish durable instructions, milestone gates, and evidence-based progress reporting.
+## Engineering decisions
 
-**Acceptance criteria**
-- [x] Root `AGENTS.md` committed and GitHub commit returned.
-- [x] `docs/ROADMAP.md` committed and fetched/verified.
-- [x] `docs/PROGRESS.md` committed and fetched/verified.
-- [x] Both documents agree on M0 as the first unverified implementation milestone.
-
-**Expected result:** Codex and ChatGPT can inspect the same source-of-truth files. Creation of documents does **not** imply M0 completion.
-
-## Next implementation task — M0.1: Local NiFi boot
-**Status:** NOT STARTED
-
-**Objective:** Start one reproducible Apache NiFi container locally using a pinned Docker image version.
-
-**Minimum scope**
-1. Verify Docker/Compose availability locally and select a current official NiFi image tag using official documentation.
-2. Add one minimal `compose.yaml` and `.gitignore` entries as needed; avoid credentials in version control.
-3. Document `docker compose up -d`, a concrete health/readiness verification command, and `docker compose down` in `README.md`.
-4. Run the commands and collect real `docker compose ps` and service readiness evidence. Record exact image tag and outcome.
-5. Do not create a complex flow, introduce agents, or add application frameworks in this task.
-
-**Acceptance criteria:** Container starts reliably, documented readiness verification succeeds, shutdown succeeds, and real logs/commands/results are recorded. If runtime isn't accessible, leave task **READY FOR VALIDATION** or **BLOCKED**, not completed.
-
-**Why this skill matters:** Reproducible incident environments underpin trustworthy evidence collection, controlled failure scenarios, and subsequent AI evaluations.
-
-## Decisions and safety boundaries
-- NiFi first; Apache Camel only after earlier gates.
-- No write-capable diagnosis tools or production remediation without explicit approval.
-- Evidence-led diagnostic baseline before adding LLM complexity.
-- No secrets or sensitive operational logs committed; use sanitized fixtures.
-- Statuses: **NOT STARTED**, **IN PROGRESS**, **BLOCKED**, **READY FOR VALIDATION**, **COMPLETED** (verified only).
+- Apache NiFi is first adapter, not full product scope.
+- Keep incident evidence grounded in processor state, queues, provenance, and log/bulletin facts.
+- Treat malformed JSON (`failure`) and schema-invalid JSON (`invalid`) as separate labels.
+- Do not interpret a STOPPED state alone as a fault; no automatic restart/remediation.
+- Do not commit credentials or personal/customer payloads; existing full payload logging is for synthetic lab data only.
+- Implement read-only Python monitoring and deterministic diagnoses before LLMs or agents.
+- Documentation ownership: ChatGPT can update progress/incident docs; user implements code/configs and supplies evidence for review unless explicitly delegating further work.
 
 ## Review log
 
-| Date | Item | Evidence | Outcome |
+| Date | Deliverable | Evidence | Outcome |
 | --- | --- | --- | --- |
-| 2026-11-13 | Repository access | GitHub repository metadata and `main` contents inspected | Verified |
-| 2026-11-13 | Codex instructions | `AGENTS.md` commit `1cf8dee8d0f3890bbf355d7c154a94e56aae610c` | Verified |
-| 2026-11-13 | Governance documents | Both files committed and fetched from `main` | COMPLETED |
-| 2026-11-13 | M0.1 setup | NiFi Compose, Makefile, environment example, startup docs reviewed; runtime not yet tested | IN PROGRESS |
+| 2026-11-13 | NiFi container, UI and restart | User-reported Docker/HTTP output and screenshots | M0.1 COMPLETED |
+| 2026-11-13 | Three-way JSON validation | Provenance, `JsonEOFException`, validation attribute logs | VERIFIED |
+| 2026-11-13 | PutFile delivery and invalid destination | Output files, exception stack, failure logger, recovery output | VERIFIED |
+| 2026-11-13 | Stopped processor and queue | Two screenshots showing 1→2 waiting FlowFiles | VERIFIED |
+| 2026-11-13 | Final NiFi flow export | `nifi/flows/AI_Incident_Lab.json` fetched from `main` | VERIFIED |
+| 2026-11-13 | Incident documentation | `docs/INCIDENT_FIXTURES.md` committed | VERIFIED |
 
 ## One next action
-The repository owner runs **M0.1 — Local NiFi boot** on their own machine and submits sanitized `make nifi-config`, `make nifi-ps`, HTTPS readiness/login and restart/shutdown evidence for ChatGPT review. Do not advance until the acceptance criteria are met.
 
-_Update this document when evidence changes. Never mark tests successful because code merely exists._
+**M0 closeout:** On a clean NiFi instance, import the committed `nifi/flows/AI_Incident_Lab.json` and verify it loads with 8 processors / 7 connections and no validation errors; capture evidence. Do not claim clean import success until user demonstrates it.
+
+After completing M0, begin M1 with a *single smallest practical task*: a read-only, testable Python REST client to retrieve Process Group processor status.
